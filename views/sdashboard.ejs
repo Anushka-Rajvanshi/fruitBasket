@@ -1,0 +1,91 @@
+<%-include('partials/header')-%>
+<div class="hi-div">
+  <h2>Hi <%=name%>! Welcome Back.</h2>
+</div>
+<div class="addItemDiv">
+  <h3 class="add-heading">Add fruits to sell:</h3>
+  <form action="/addFruitsForm" class="addFruitsForm" method="POST">
+    <div class="row">
+      <div class="col-lg-6 col-md-6 col-sm-6 form-col">
+        <label for="fruitName">Fruit Name: </label>
+      </div>
+      <div class="col-lg-6 col-md-6 col-sm-6 input-div form-col">
+        <select name="fruitName" required>
+          <option value="Apple">Apple</option>
+          <option value="Orange">Orange</option>
+          <option value="Mango">Mango</option>
+          <option value="Banana">Banana</option>
+          <option value="Grapes">Grapes</option>
+          <option value="Strawberry">Strawberry</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-6 col-md-6 col-sm-6 form-col">
+        <label for="price">Price per kg:</label>
+      </div>
+      <div class="col-lg-6 col-md-6 col-sm-6 input-div form-col">
+        <input type="number" name="price" class="form-input" required/>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-6 col-md-6 col-sm-6 form-col">
+        <label for="quantity">Total quantity in kg:</label>
+      </div>
+      <div class="col-lg-6 col-md-6 col-sm-6 input-div form-col">
+        <input type="number" name="quantity" class="form-input" required />
+      </div>
+    </div>
+    <input type="hidden" value="<%=name%>" name="seller" />
+    <button type="submit" class="add-btn">Add</button>
+
+  </form>
+</div>
+<div class="ListItemsDiv">
+  <h2 class="add-heading">Your items:</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Price per kg</th>
+        <th scope="col">Quantity in kg</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% items.map(item => { %>
+      <form action="/addedFruitsForm/<%=item._id%>" class="addedFruitsForm" method="POST">
+        <tr>
+          <td scope="row"><%=item.name%></td>
+          <td><%=item.price%></td>
+          <td><%=item.quantity%></td>
+          <td onclick="editRow('<%=item._id%>')" id="editBtn<%=item._id%>" class="edit-btn">Edit</td>
+          <td id="<%=item._id%>" style="display: none">
+            <input type="number" placeholder="Update price" name="updatedPrice" class="update-input" />
+            <button type="submit" onclick="setUpdate('<%=item._id%>')" name="submitBtn" class="update-btn"
+              id="ubtn<%=item._id%>">Update</button>
+          </td>
+          <td><button type="submit" onclick="setDelete('<%=item._id%>')" name="submitBtn" class="delete-btn"
+              id="dbtn<%=item._id%>">Delete</button></td>
+        </tr>
+      </form>
+      <% }); %>
+    </tbody>
+  </table>
+
+</div>
+<script>
+  function editRow(id) {
+    document.getElementById("editBtn" + id).style.display = "none";
+    document.getElementById(id).style.display = "initial";
+  }
+
+  function setUpdate(id) {
+    document.getElementById("ubtn" + id).setAttribute("value", "update");
+  }
+
+  function setDelete(id) {
+    document.getElementById("dbtn" + id).setAttribute("value", "delete");
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<%-include('partials/header')-%>
+    <div class="background">
+        <img src="/images/bg1.jpg" alt="bg-img" class="bg-img">
+    </div>
+    <div class="container">
+        <h1 class="bigHeading">Welcome to FruitBasket!</h1>
+        <h3 class="h3text">You are a....</h3>
+        <div class="row" style="justify-content:center; text-align:center">
+                <div class="linkdiv col-lg-3 col-md-3 col-sm-4"> <a href="/seller" >Seller</a> </div>
+                <div class="linkdiv col-lg-3 col-md-3 col-sm-4"> <a href="/buyer">Buyer</a></div>
+        </div>
+        
+    </div>
+    <script>
+        if(<%-sregister%>){
+            alert("Seller registered successfully. Please LogIn now.")
+        }
+        if(<%-bregister%>){
+            alert("Buyer registered successfully. Please LogIn now.")
+        }
+    </script>
+</body>
+</html>

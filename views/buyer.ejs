@@ -1,0 +1,30 @@
+<%-include('partials/header')-%>
+<div class="row form-row">
+    <div class="col-lg-6 col-md-6 form-col">
+        <h1>Existing Buyer? Login Here</h1>
+        <form action="/blogin" method="POST" class="lform">
+            <input type="text" placeholder="Username" name="username" class="form-input" required><br>
+            <input type="password" placeholder="Password" name="password" class="form-input" required><br>
+            <button type="submit" class="form-btn">Login</button>
+        </form>
+    </div>
+    <div class="col-lg-6 col-md-6 form-col">
+        <h1>New Buyer? Create an account</h1>
+        <form action="/bregister" method="POST" class="rform">
+            <input type="text" placeholder="Username" name="username" class="form-input" required><br>
+            <input type="password" placeholder="Password" name="password" class="form-input" required><br>
+            <input type="number" placeholder="Contact Number" name="phone" class="form-input" required><br>
+            <button type="submit" class="form-btn">Register</button>
+        </form>
+    </div>
+</div>
+<script>
+    if ( <%-exists%>) {
+        alert("This username already exists.")
+    }
+    if ( <%-error%> ) {
+        alert("Invalid Username or Password.")
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<%-include('partials/header')-%>
+    <div class="welcome-div">
+        <h1>Items in your cart:</h1>
+    </div>
+        <% if(items.length === 0){ %>
+            <div class="empty-div" style="font-size: 1.2rem;">Your cart is empty.</div>
+        <%}else{%>
+            <div class="items-div">
+        <% items.map((item) => {%>
+            <div class="item-div">
+                <img src="images/<%=item.name%>.jpg" alt="fruits-img" class="item-img">
+                <h4 class="item-name"><%=item.name%></h4>
+                <p>Rs. <%=item.price%> per kg <br>Seller: <%=item.seller%></p>
+                <a href="/remove/<%=item._id%>"><button class="remove-btn">Remove</button></a>
+            </div>
+        <%})%>
+            </div>
+        <div>
+            <a href="#"><button class="proceed-btn">Proceed to Buy</button></a>
+        </div>
+    <%}%>
+</body>
+</html>

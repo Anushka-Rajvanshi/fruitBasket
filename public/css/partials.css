@@ -1,0 +1,45 @@
+*{
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    font-family: 'Roboto Slab', serif;
+}
+.logo, .logo:hover{
+    color: #ffffff;
+}
+
+nav
+{
+    margin-bottom: 30px;
+    background-color: #00b125;
+}
+
+@media only screen and (max-width: 380px) {
+    .s2slogo{
+        width: 95px;
+        height: 48px;
+    }
+   }
+
+.dropicon{
+    color: #ffffff;
+}
+
+.navitem{
+    margin: 0 28px;
+    color: #ffffff;
+    font-size: 20px;
+}
+
+.nav-link{
+    color: #ffffff;
+}
+
+.nav-link .active{
+    color: #696968;
+    border-bottom: 3px solid #696968;
+}
+
+.nav-link:hover{
+    color: #696968;
+}

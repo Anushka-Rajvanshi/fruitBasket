@@ -1,0 +1,45 @@
+*{
+    font-family: 'Roboto Slab', serif;
+}
+
+.form-row{
+    margin: 8% 0px ;
+    text-align: center;
+}
+
+.form-col{
+    padding: 2% 0%;
+}
+
+.lform, .rform{
+    margin: 2%;
+    padding: 10px 0px;
+    border: 5px solid #ff1a4f;
+    border-radius: 12px;
+}
+
+.form-row h1{
+    font-family: 'Roboto', sans-serif;
+    /* color: #ff1329; */
+    color: #ff1a4f;
+    font-size: 2rem;
+}
+
+.form-input{
+    margin: 10px auto;
+    width: 70%;
+    padding: 2px;
+}
+
+.form-btn{
+    background-color: #ff1a4f;
+    color: white;
+    margin: 10px auto;
+    padding: 1% 2%;
+    border: none;
+    border-radius: 12px;
+}
+
+.form-btn:hover{
+    background-color: #c90936;
+}

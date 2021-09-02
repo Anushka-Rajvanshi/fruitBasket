@@ -1,0 +1,76 @@
+*{
+    text-align: center;
+}
+
+.addItemDiv{
+    padding: 20px 0px;
+    margin: 30px 2%;
+    border-radius: 12px;
+    background-color: #ddfcd1;
+}
+
+.hi-div h2, .add-heading{
+    color: #ff1a4f;
+    font-family: 'Roboto', sans-serif;
+}
+
+.add-heading{
+    margin: 30px auto;
+}
+
+.hi-div h2{
+    font-weight: 700;
+}
+
+.form-row{
+    margin-right: 0;
+    margin-left: 0;
+}
+
+.form-col{
+    padding: 1%;
+}
+
+.input-div{
+    text-align: left;
+}
+
+@media only screen and (max-width: 580px){
+    .input-div{
+        text-align: center;
+    }
+}
+
+.form-input{
+    width: 70%;
+}
+
+.add-btn, .update-btn, .delete-btn{
+    border: none;
+    padding: 0.8% 2%;
+    margin: 15px auto;
+    color: white;
+    background-color: #ff1a4f;
+    border-radius: 12px;
+}
+
+.ListItemsDiv{
+    padding: 20px 0px;
+    margin: 30px 2%;
+    border-radius: 12px;
+    background-color: #ffe1e1;
+}
+
+.edit-btn{
+    cursor: pointer;
+    color: #009220;
+}
+
+.update-btn{
+    margin: 10px auto;
+    background-color: #009220;
+}
+
+.delete-btn{
+    margin: 0;
+}

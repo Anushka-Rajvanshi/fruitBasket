@@ -1,0 +1,24 @@
+<%-include('partials/header')-%>
+    <div class="welcome-div">
+        <h1>Welcome! <%=username%></h1>
+        <h3>Shop available fruits:</h3>
+    </div>
+    <div class="allitems-div">
+        <% items.map((item) => {%>
+            <div class="item-div">
+                <img src="images/<%=item.name%>.jpg" alt="fruits-img" class="item-img">
+                <h4 class="item-name"><%=item.name%></h4>
+                <p class="item-details">Rs. <%=item.price%> per kg <br>Seller: <%=item.seller%></p>
+                <% if(!isSeller){%>
+                    <a href="/addtocart/<%=item._id%>"><button class="add-btn">Add to Cart</button></a>
+                <%}%>
+            </div>
+        <%})%>
+    </div>
+    <script>
+        if(<%-added%>){
+            alert("Item added to cart!")
+        }
+    </script>
+    </body>
+    </html>
