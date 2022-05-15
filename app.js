@@ -10,6 +10,7 @@ const bcrypt = require("bcrypt");
 const DB_USER = process.env.DB_USER;
 const DB_PASS = process.env.DB_PASS;
 const _ = require("lodash");
+const { toLower } = require("lodash");
 const app = express();
 
 app.use(express.static(__dirname + "/public"));
@@ -17,15 +18,15 @@ app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 app.use(
-    session({
-      secret: process.env.SECRET,
-      resave: false,
-      saveUninitialized: false,
-    })
-  );
-  
-  app.use(passport.initialize());
-  app.use(passport.session());
+  session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 mongoose.connect(
   "mongodb+srv://" +
@@ -65,25 +66,25 @@ sellerSchema.plugin(passportLocalMongoose);
 const Seller = new mongoose.model("Seller", sellerSchema);
 
 const itemSchema = new mongoose.Schema({
-    name: {
-      type: String,
-      required: true
-    },
-    price: {
-      type: Number,
-      required: true
-    },
-    quantity:{
-        type: Number,
-        required: true
-    },
-    seller: {
-      type: String,
-      required: true
-    },
-  });
-  
-  const Item = new mongoose.model("Item", itemSchema);
+  name: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+  },
+  seller: {
+    type: String,
+    required: true,
+  },
+});
+
+const Item = new mongoose.model("Item", itemSchema);
 
 const buyerSchema = new mongoose.Schema({
   username: {
@@ -98,9 +99,9 @@ const buyerSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  items:{
-      type : Array,
-      default:[],
+  items: {
+    type: Array,
+    default: [],
   },
   role: {
     type: String,
@@ -121,18 +122,21 @@ passport.use(
       passReqToCallback: true,
     },
     function (req, username, password, done) {
-      Seller.findOne({ username: username }, function (err, user) {
-        if (err) return done(err);
-        if (!user) return done(null, false, { message: "Incorrect ID" });
-
-        bcrypt.compare(password, user.password, function (err, res) {
+      Seller.findOne(
+        { username: username.toLowerCase() },
+        function (err, user) {
           if (err) return done(err);
-          if (res === false)
-            return done(null, false, { message: "Incorrect password." });
+          if (!user) return done(null, false, { message: "Incorrect ID" });
 
-          return done(null, user);
-        });
-      });
+          bcrypt.compare(password, user.password, function (err, res) {
+            if (err) return done(err);
+            if (res === false)
+              return done(null, false, { message: "Incorrect password." });
+
+            return done(null, user);
+          });
+        }
+      );
     }
   )
 );
@@ -146,18 +150,21 @@ passport.use(
       passReqToCallback: true,
     },
     function (req, username, password, done) {
-      Buyer.findOne({ username: username }, function (err, foundUser) {
-        if (err) return done(err);
-        if (!foundUser) return done(null, false, { message: "Incorrect ID" });
-
-        bcrypt.compare(password, foundUser.password, function (err, res) {
+      Buyer.findOne(
+        { username: username.toLowerCase() },
+        function (err, foundUser) {
           if (err) return done(err);
-          if (res === false)
-            return done(null, false, { message: "Incorrect password." });
+          if (!foundUser) return done(null, false, { message: "Incorrect ID" });
 
-          return done(null, foundUser);
-        });
-      });
+          bcrypt.compare(password, foundUser.password, function (err, res) {
+            if (err) return done(err);
+            if (res === false)
+              return done(null, false, { message: "Incorrect password." });
+
+            return done(null, foundUser);
+          });
+        }
+      );
     }
   )
 );
@@ -182,52 +189,66 @@ passport.deserializeUser(function (id, done) {
   }
 });
 
-function isLoggedIn (req,res, next){
-    if(req.isAuthenticated()) return next();
-    res.redirect("/");
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated()) return next();
+  res.redirect("/");
 }
 
-function isLoggedOut(req, res, next){
-    if (!req.isAuthenticated()) return next();
-    else if(req.user.role === "seller"){
-        res.redirect("/sdashboard");
-    }else{
-        res.redirect("/allitems");
-    }
+function isLoggedOut(req, res, next) {
+  if (!req.isAuthenticated()) return next();
+  else if (req.user.role === "seller") {
+    res.redirect("/sdashboard");
+  } else {
+    res.redirect("/allitems");
+  }
 }
 
-function isSeller(req,res,next){
-    if(req.user.role === "seller") return next();
-    res.redirect("/seller");
+function isSeller(req, res, next) {
+  if (req.user.role === "seller") return next();
+  res.redirect("/seller");
 }
 
-function isBuyer(req, res, next){
-    if(req.user.role ==="buyer") return next();
-    res.redirect("/buyer");
+function isBuyer(req, res, next) {
+  if (req.user.role === "buyer") return next();
+  res.redirect("/buyer");
 }
-function checkSeller(req){
-  if(req.isAuthenticated()){
-    return req.user.role==="seller"? true: false;
+function checkSeller(req) {
+  if (req.isAuthenticated()) {
+    return req.user.role === "seller" ? true : false;
   }
   return false;
 }
-function checkBuyer(req){
-  if(req.isAuthenticated()){
-    return req.user.role==="buyer"? true: false;
+function checkBuyer(req) {
+  if (req.isAuthenticated()) {
+    return req.user.role === "buyer" ? true : false;
   }
   return false;
 }
 
 app.get("/", isLoggedOut, function (req, res) {
-  res.render("home",{sregister:req.query.sregister, bregister: req.query.bregister, isSeller: checkSeller(req), isBuyer: checkBuyer(req), style:"home"});
+  res.render("home", {
+    sregister: req.query.sregister,
+    bregister: req.query.bregister,
+    isSeller: checkSeller(req),
+    isBuyer: checkBuyer(req),
+    style: "home",
+  });
 });
 
 app.get("/seller", isLoggedOut, function (req, res) {
-  res.render("seller",{exists:req.query.exists, error:req.query.error,  isSeller: checkSeller(req), isBuyer: checkBuyer(req), style:"seller"});
+  res.render("seller", {
+    exists: req.query.exists,
+    error: req.query.error,
+    isSeller: checkSeller(req),
+    isBuyer: checkBuyer(req),
+    style: "seller",
+  });
 });
 
 app.post("/sregister", async (req, res) => {
-  const exists = await Seller.exists({ username: req.body.username });
+  const exists = await Seller.exists({
+    username: req.body.username.toLowerCase(),
+  });
   if (exists) {
     res.redirect("/seller?exists=true&error=false");
     return;
@@ -238,7 +259,7 @@ app.post("/sregister", async (req, res) => {
       if (err) return next(err);
 
       let newSeller = new Seller({
-        username: req.body.username,
+        username: req.body.username.toLowerCase(),
         password: hash,
         phone: req.body.phone,
       });
@@ -250,154 +271,204 @@ app.post("/sregister", async (req, res) => {
   });
 });
 
-app.post("/slogin",  passport.authenticate("seller-login", {
+app.post(
+  "/slogin",
+  passport.authenticate("seller-login", {
     successRedirect: "/sdashboard",
     failureRedirect: "/seller?error=true&exists=false",
-  }));
+  })
+);
 
 app.get("/buyer", isLoggedOut, function (req, res) {
-  res.render("buyer",{exists:req.query.exists, error:req.query.error, isSeller: checkSeller(req), isBuyer: checkBuyer(req), style:"seller"});
+  res.render("buyer", {
+    exists: req.query.exists,
+    error: req.query.error,
+    isSeller: checkSeller(req),
+    isBuyer: checkBuyer(req),
+    style: "seller",
+  });
 });
 
 app.post("/bregister", async (req, res) => {
-    const exists = await Buyer.exists({ username: req.body.username });
-    if (exists) {
-      res.redirect("/buyer?exists=true&error=false");
-      return;
-    }
-    bcrypt.genSalt(10, function (err, salt) {
+  const exists = await Buyer.exists({
+    username: req.body.username.toLowerCase(),
+  });
+  if (exists) {
+    res.redirect("/buyer?exists=true&error=false");
+    return;
+  }
+  bcrypt.genSalt(10, function (err, salt) {
+    if (err) return next(err);
+    bcrypt.hash(req.body.password, salt, function (err, hash) {
       if (err) return next(err);
-      bcrypt.hash(req.body.password, salt, function (err, hash) {
-        if (err) return next(err);
-  
-        let newBuyer = new Buyer({
-          username: req.body.username,
-          password: hash,
-          phone: req.body.phone,
-        });
-  
-        newBuyer.save();
-        req.logout();
-        res.redirect("/?bregister=true&sregister=false");
+
+      let newBuyer = new Buyer({
+        username: req.body.username.toLowerCase(),
+        password: hash,
+        phone: req.body.phone,
       });
+
+      newBuyer.save();
+      req.logout();
+      res.redirect("/?bregister=true&sregister=false");
     });
   });
+});
 
-app.post("/blogin", passport.authenticate("buyer-login", {
+app.post(
+  "/blogin",
+  passport.authenticate("buyer-login", {
     successRedirect: "/",
     failureRedirect: "/buyer?error=true&exists=false",
   })
+);
+
+app.get("/sdashboard", isLoggedIn, isSeller, function (req, res) {
+  Seller.findOne(
+    { username: req.user.username.toLowerCase() },
+    function (err, foundUser) {
+      if (!err) {
+        Item.find(
+          { seller: req.user.username.toLowerCase() },
+          function (error, foundItems) {
+            if (!error) {
+              res.render("sdashboard", {
+                name: _.capitalize(foundUser.username),
+                items: foundItems,
+                isSeller: checkSeller(req),
+                isBuyer: checkBuyer(req),
+                style: "sdashboard",
+              });
+            } else {
+              console.log(error);
+            }
+          }
+        );
+      } else {
+        console.log("error");
+      }
+    }
   );
-
-app.get("/sdashboard", isLoggedIn, isSeller, function(req,res){
-    Seller.findOne({username: req.user.username}, function(err, foundUser){
-        if(!err){
-            Item.find({seller: req.user.username}, function(error, foundItems){
-                if(!error){
-                    res.render("sdashboard", {name: _.capitalize(foundUser.username), items: foundItems,  isSeller: checkSeller(req), isBuyer: checkBuyer(req), style: "sdashboard"});
-                }else{
-                    console.log(error);
-                }
-            });
-        }else{
-            console.log("error");
-        }
-    });
 });
 
-app.get("/allitems", function(req,res){
-    Item.find({},function(err, foundItems){
-        if(!err){
-        let name="";
-        if(req.isAuthenticated()){
-          name = req.user.username;
-        }
-        res.render("allItems", {items: foundItems, username: _.capitalize(name),  isSeller: checkSeller(req), isBuyer: checkBuyer(req), added: req.query.added, style:"allitems"});
-        }else{
-          console.log(err);
-        }
-    });
-});
-
-app.post("/addFruitsForm", function(req,res){
-    const newItem = new Item({
-        name: req.body.fruitName,
-        price: req.body.price,
-        quantity: req.body.quantity,
-        seller: req.body.seller
-    });
-    newItem.save();
-    res.redirect("/sdashboard");
-});
-
-app.post("/addedFruitsForm/:id", function(req, res){
-  if(req.body.submitBtn==="update"){
-  Item.findOneAndUpdate({_id: req.params.id}, {$set:{price: req.body.updatedPrice}}, function(err){
-    if(err){
-      console.log(err);
-    }else{
-      res.redirect("/sdashboard");
-    }
-  });
-}else if(req.body.submitBtn === "delete"){
-  Item.findOneAndRemove({_id: req.params.id}, function(err){
-    if(err){
-      console.log(err);
-    }else{
-      res.redirect("/sdashboard");
-    }
-  });
-}
-else{
-  res.send("Error");
-}
-});
-
-app.get("/addtocart/:id", isLoggedIn, isBuyer, function(req,res){
-  Buyer.updateOne({username: req.user.username}, {$push: {items: req.params.id }}, function(err, added) {
-    if( err || !added ) {
-      console.log(err);
-    }
-    else {
-      res.redirect("/allitems?added=true");
-      }});
-});
-
-app.get("/bcart", isLoggedIn, isBuyer, function(req,res){
-  Buyer.find({username:req.user.username}, function(err, foundUser){
-    if(!err){
-      let items = foundUser[0].items;
-      Item.find({}, function(error, foundItems){
-        let arr=[];
-        if(!error){
-          foundItems.map(item => {
-            items.map(id => {
-              if(id == item._id){
-                arr.push(item);
-              }
-            });
-          });
-          res.render("bcart", {items: arr,  isSeller: checkSeller(req), isBuyer: checkBuyer(req), style:"bcart"});
-          }else{
-          console.log(error);
-        }
+app.get("/allitems", function (req, res) {
+  Item.find({}, function (err, foundItems) {
+    if (!err) {
+      let name = "";
+      if (req.isAuthenticated()) {
+        name = req.user.username;
+      }
+      res.render("allItems", {
+        items: foundItems,
+        username: _.capitalize(name),
+        isSeller: checkSeller(req),
+        isBuyer: checkBuyer(req),
+        added: req.query.added,
+        style: "allitems",
       });
-    }else{
+    } else {
       console.log(err);
     }
   });
 });
 
-app.get("/remove/:id", isLoggedIn, isBuyer, function(req,res){
-  Buyer.updateOne({username: req.user.username}, {$pull: {items: req.params.id }}, function(err, removed) {
-    if( err || !removed ) {
-      console.log(err);
-    }
-    else {
-      res.redirect("/bcart");
-      }});
+app.post("/addFruitsForm", function (req, res) {
+  const newItem = new Item({
+    name: req.body.fruitName,
+    price: req.body.price,
+    quantity: req.body.quantity,
+    seller: req.body.seller.toLowerCase(),
+  });
+  newItem.save();
+  res.redirect("/sdashboard");
 });
 
+app.post("/addedFruitsForm/:id", function (req, res) {
+  if (req.body.submitBtn === "update") {
+    Item.findOneAndUpdate(
+      { _id: req.params.id },
+      { $set: { price: req.body.updatedPrice } },
+      function (err) {
+        if (err) {
+          console.log(err);
+        } else {
+          res.redirect("/sdashboard");
+        }
+      }
+    );
+  } else if (req.body.submitBtn === "delete") {
+    Item.findOneAndRemove({ _id: req.params.id }, function (err) {
+      if (err) {
+        console.log(err);
+      } else {
+        res.redirect("/sdashboard");
+      }
+    });
+  } else {
+    res.send("Error");
+  }
+});
+
+app.get("/addtocart/:id", isLoggedIn, isBuyer, function (req, res) {
+  Buyer.updateOne(
+    { username: req.user.username.toLowerCase() },
+    { $push: { items: req.params.id } },
+    function (err, added) {
+      if (err || !added) {
+        console.log(err);
+      } else {
+        res.redirect("/allitems?added=true");
+      }
+    }
+  );
+});
+
+app.get("/bcart", isLoggedIn, isBuyer, function (req, res) {
+  Buyer.find(
+    { username: req.user.username.toLowerCase() },
+    function (err, foundUser) {
+      if (!err) {
+        let items = foundUser[0].items;
+        Item.find({}, function (error, foundItems) {
+          let arr = [];
+          if (!error) {
+            foundItems.map((item) => {
+              items.map((id) => {
+                if (id == item._id) {
+                  arr.push(item);
+                }
+              });
+            });
+            res.render("bcart", {
+              items: arr,
+              isSeller: checkSeller(req),
+              isBuyer: checkBuyer(req),
+              style: "bcart",
+            });
+          } else {
+            console.log(error);
+          }
+        });
+      } else {
+        console.log(err);
+      }
+    }
+  );
+});
+
+app.get("/remove/:id", isLoggedIn, isBuyer, function (req, res) {
+  Buyer.updateOne(
+    { username: req.user.username.toLowerCase() },
+    { $pull: { items: req.params.id } },
+    function (err, removed) {
+      if (err || !removed) {
+        console.log(err);
+      } else {
+        res.redirect("/bcart");
+      }
+    }
+  );
+});
 
 app.get("/logout", function (req, res) {
   req.logout();
@@ -408,6 +479,6 @@ let port = process.env.PORT;
 if (port == null || port == "") {
   port = 3000;
 }
-app.listen(port , function (req, res) {
-  console.log("Server started at port "+port);
+app.listen(port, function (req, res) {
+  console.log("Server started at port " + port);
 });
