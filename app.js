@@ -226,7 +226,7 @@ function checkBuyer(req) {
 }
 
 app.get("/", isLoggedOut, function (req, res) {
-  res.render("home", {
+  res.render("home.ejs", {
     sregister: req.query.sregister,
     bregister: req.query.bregister,
     isSeller: checkSeller(req),
@@ -236,7 +236,7 @@ app.get("/", isLoggedOut, function (req, res) {
 });
 
 app.get("/seller", isLoggedOut, function (req, res) {
-  res.render("seller", {
+  res.render("seller.ejs", {
     exists: req.query.exists,
     error: req.query.error,
     isSeller: checkSeller(req),
@@ -280,7 +280,7 @@ app.post(
 );
 
 app.get("/buyer", isLoggedOut, function (req, res) {
-  res.render("buyer", {
+  res.render("buyer.ejs", {
     exists: req.query.exists,
     error: req.query.error,
     isSeller: checkSeller(req),
@@ -332,7 +332,7 @@ app.get("/sdashboard", isLoggedIn, isSeller, function (req, res) {
           { seller: req.user.username.toLowerCase() },
           function (error, foundItems) {
             if (!error) {
-              res.render("sdashboard", {
+              res.render("sdashboard.ejs", {
                 name: _.capitalize(foundUser.username),
                 items: foundItems,
                 isSeller: checkSeller(req),
@@ -358,7 +358,7 @@ app.get("/allitems", function (req, res) {
       if (req.isAuthenticated()) {
         name = req.user.username;
       }
-      res.render("allItems", {
+      res.render("allItems.ejs", {
         items: foundItems,
         username: _.capitalize(name),
         isSeller: checkSeller(req),
@@ -439,7 +439,7 @@ app.get("/bcart", isLoggedIn, isBuyer, function (req, res) {
                 }
               });
             });
-            res.render("bcart", {
+            res.render("bcart.ejs", {
               items: arr,
               isSeller: checkSeller(req),
               isBuyer: checkBuyer(req),
